@@ -3,18 +3,17 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mapa Violeta CNV 🗺️ Reprograma-T</title>
+    <title>Mapa Violeta CNV - Violência contra Pessoas Trans 🏳️‍⚧️</title>
     
     <link rel="icon" href="favicon.ico" sizes="any"> 
     <link rel="apple-touch-icon" href="apple-touch-icon.png">
-    <meta name="theme-color" content="#FFA500">
+    <meta name="theme-color" content="#9b59b6">
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="manifest" href="manifest.json">
     
     <style>
-    /* Estilos Globais - Variáveis mantidas para consistência dos formulários e tema geral */
     :root {
         --mapa-violeta-cor-destaque: #9b59b6;
         --mapa-violeta-cor-destaque-hover: #8e44ad;
@@ -24,91 +23,95 @@
         --mapa-violeta-fundo-pagina: #0a0a14;
         --color-white: #FFFFFF;
         --font-principal: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        --color-orange: #FFA500; 
-        --color-gold: #FFD700; 
-        --color-silver: #C0C0C0; 
     }
 
-    /* Reset Básico e Configurações Globais */
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { height: 100%; } 
     body {
         font-family: var(--font-principal);
         background-color: var(--mapa-violeta-fundo-pagina);
-        color: var(--color-silver); 
+        color: var(--color-white); 
         display: flex;
         flex-direction: column;
         line-height: 1.6;
         overflow: hidden; 
     }
 
-    /* Estrutura da Página Principal */
-    .app-main-container { 
-        flex: 1; 
-        display: flex; 
-        flex-direction: column; 
-    }
-    .main-content-area { 
-        flex: 1; 
-        background-color: var(--mapa-violeta-fundo-pagina); 
-        padding: 0; 
-    }
-    .mapa-violeta-main-area { 
-        flex-grow: 1; 
-        padding: 20px; 
-        overflow-y: auto; 
-        display: flex; 
-        flex-direction: column; 
-    }
+    .app-main-container { flex: 1; display: flex; flex-direction: column; }
+    .main-content-area { flex: 1; background-color: var(--mapa-violeta-fundo-pagina); padding: 0; }
+    .mapa-violeta-main-area { flex-grow: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; }
+    
     .mapa-violeta-header-secao { 
         text-align: center; 
         margin-bottom: 20px; 
+        background: linear-gradient(135deg, #9b59b6, #8e44ad);
+        padding: 20px;
+        border-radius: 10px;
+        color: white;
     }
     .mapa-violeta-header-secao h1 { 
-        color: var(--mapa-violeta-cor-destaque); 
         font-size: 2em; 
         margin-bottom: 10px; 
-        text-shadow: 0 0 8px rgba(155, 89, 182, 0.5); 
+        text-shadow: 0 0 8px rgba(0, 0, 0, 0.5); 
     }
-    .mapa-violeta-header-secao h1 i { 
-        margin-right: 10px; 
-    }
+    .mapa-violeta-header-secao h1 i { margin-right: 10px; }
     .mapa-violeta-header-secao p.subtitulo-mapa { 
         font-size: 1.05em; 
-        color: var(--mapa-violeta-cor-texto-form); 
         max-width: 700px; 
         margin: 0 auto 15px; 
     }
 
-    /* Estilos do Mapa e Ícones */
+    .info-painel {
+        background: var(--mapa-violeta-fundo-form);
+        padding: 15px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        border-left: 4px solid #e74c3c;
+    }
+
+    .info-painel h3 {
+        color: #e74c3c;
+        margin-bottom: 10px;
+    }
+
+    .estatisticas {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+
+    .estatistica-item {
+        background: var(--mapa-violeta-fundo-form);
+        padding: 15px;
+        border-radius: 8px;
+        text-align: center;
+        border: 1px solid var(--mapa-violeta-borda-form);
+    }
+
+    .estatistica-numero {
+        font-size: 2em;
+        font-weight: bold;
+        color: var(--mapa-violeta-cor-destaque);
+        display: block;
+    }
+
+    .estatistica-label {
+        font-size: 0.9em;
+        color: var(--mapa-violeta-cor-texto-form);
+    }
+
     #map {
-        height: 65vh;
-        min-height: 500px;
+        height: 60vh;
+        min-height: 400px;
         width: 100%;
         border-radius: 10px;
         border: 2px solid var(--mapa-violeta-borda-form);
         box-shadow: 0 4px 12px rgba(0,0,0,0.4);
         margin-bottom: 20px;
-        background-color: #e0e0e0;
+        background-color: #2c3e50;
     }
 
-    .custom-registro-icon {
-        font-size: 32px;
-        color: var(--mapa-violeta-cor-destaque);
-        text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6);
-    }
-
-    .user-map-icon {
-        width: 30px;
-        height: 30px;
-        border-radius: 50%;
-        background-size: cover;
-        background-position: center;
-        border: 2px solid var(--mapa-violeta-cor-destaque);
-        box-shadow: 0 0 5px rgba(0,0,0,0.5);
-    }
-
-    /* Estilos dos Pop-ups */
     .leaflet-popup-content-wrapper {
         background: #ffffff;
         color: #333333;
@@ -116,308 +119,74 @@
         box-shadow: 0 3px 15px rgba(0,0,0,0.2);
         border: 1px solid #ddd;
     }
-    .leaflet-popup-tip {
-        background: #ffffff;
-    }
-    
+
     .popup-marker-details {
-        max-height: 280px;
+        max-height: 300px;
         overflow-y: auto;
         padding-right: 10px;
     }
-    .registro-foto-popup {
-        width: 100%;
-        height: 120px;
-        object-fit: cover;
-        border-radius: 4px;
-        margin-bottom: 12px;
-        background-color: #f0f0f0;
-    }
+
     .popup-marker-details h4 {
         color: var(--mapa-violeta-cor-destaque);
         margin-top: 0;
         margin-bottom: 8px;
         font-size: 1.15em;
+        border-bottom: 2px solid var(--mapa-violeta-cor-destaque);
+        padding-bottom: 5px;
     }
+
     .popup-marker-details p {
         margin-bottom: 6px;
         font-size: 0.9em;
         line-height: 1.5;
         color: #555555;
     }
+
     .popup-marker-details strong {
         color: #111111;
         font-weight: 600;
     }
-    .popup-marker-details small,
-    .popup-marker-details small a.link-abrir-perfil-modal {
+
+    .popup-marker-details .fonte {
+        font-size: 0.8em;
         color: #777;
-        font-weight: normal;
-    }
-    .popup-marker-details small a.link-abrir-perfil-modal {
-        color: var(--mapa-violeta-cor-destaque) !important;
-        font-weight: bold;
+        margin-top: 10px;
+        padding-top: 10px;
+        border-top: 1px solid #eee;
     }
 
-    /* Estilos das Ações e Comentários no Pop-up */
-    .popup-marker-acoes-admin,
-    .popup-marker-comments-section {
-        margin-top: 12px;
-        padding-top: 12px;
-        border-top: 1px solid #eeeeee;
+    .legenda {
+        background: var(--mapa-violeta-fundo-form);
+        padding: 15px;
+        border-radius: 8px;
+        margin-top: 20px;
     }
-    .popup-marker-acoes-admin { text-align: right; }
-    .popup-marker-acoes-admin .btn-sm { 
-        font-size: 0.8em; 
-        padding: 4px 10px; 
-        margin-left: 8px; 
-        border-radius: 4px; 
-        border: none; 
-        cursor: pointer; 
-    }
-    .popup-marker-acoes-admin .btn--secondary { background-color: #ffc107; color: #000; }
-    .popup-marker-acoes-admin .btn--danger { background-color: #dc3545; color: white; }
-    
-    .popup-marker-comments-section h5 {
-        font-size: 1em;
-        color: #333;
+
+    .legenda h4 {
+        color: var(--mapa-violeta-cor-destaque);
         margin-bottom: 10px;
     }
-    .map-comment-item {
-        background-color: #f7f7f7;
-        border-left: 3px solid #e8e8e8;
-        padding: 8px 12px;
-        border-radius: 4px;
+
+    .legenda-item {
+        display: flex;
+        align-items: center;
         margin-bottom: 8px;
-        color: #444;
-    }
-    .map-comment-item strong { color: var(--mapa-violeta-cor-destaque); }
-    
-    .form-comment-marker textarea {
-        width: 100%;
-        padding: 8px;
-        margin-top: 8px;
-        margin-bottom: 6px;
-        border: 1px solid #cccccc;
-        border-radius: 4px;
-        background-color: #f9f9f9;
-        color: #333;
         font-size: 0.9em;
-        min-height: 40px;
-        resize: vertical;
-    }
-    .form-comment-marker textarea:focus {
-        border-color: var(--mapa-violeta-cor-destaque);
-        outline: none;
-        box-shadow: 0 0 0 2.5px rgba(155, 89, 182, 0.2);
-    }
-    .form-comment-marker button {
-        padding: 6px 12px;
-        font-size: 0.85em;
-        background-color: var(--mapa-violeta-cor-destaque);
-        color: white;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        float: right;
-    }
-    .form-comment-marker button:hover { background-color: var(--mapa-violeta-cor-destaque-hover); }
-
-    /* Formulários Flutuantes e Filtros */
-    #cnv-form-expander { 
-        position: fixed; 
-        bottom: 20px; 
-        left: 20px; 
-        z-index: 1000; 
-        box-shadow: 0 2px 10px rgba(0,0,0,0.3); 
-        cursor: pointer; 
-        transition: all 0.3s ease; 
-    }
-    #cnv-form-expander button { 
-        background-color: var(--mapa-violeta-cor-destaque); 
-        color: white; 
-        padding: 10px 15px; 
-        border-radius: 25px; 
-        border: none; 
-        font-size: 1em; 
-    }
-    #cnv-form-expander button:hover { 
-        background-color: var(--mapa-violeta-cor-destaque-hover); 
-        transform: scale(1.05); 
-    }
-    #cnv-form-expander i { margin-right: 8px; }
-
-    .mapa-cnv-form-container { 
-        position: fixed; 
-        bottom: 70px; 
-        left: 20px; 
-        max-width: 380px; 
-        width: 90%; 
-        max-height: calc(100vh - 140px); 
-        overflow-y: auto; 
-        z-index: 999; 
-        background-color: var(--mapa-violeta-fundo-form); 
-        padding: 20px; 
-        border-radius: 12px; 
-        border: 1px solid var(--mapa-violeta-borda-form); 
-        box-shadow: 0 6px 25px rgba(0,0,0,0.4); 
-        color: var(--mapa-violeta-cor-texto-form); 
-        opacity: 0; 
-        transform: translateY(30px); 
-        visibility: hidden; 
-        pointer-events: none; 
-        transition: all 0.3s ease; 
-    }
-    .mapa-cnv-form-container.visible { 
-        opacity: 1; 
-        transform: translateY(0); 
-        visibility: visible; 
-        pointer-events: auto; 
-    }
-    .mapa-cnv-form-container h3 { 
-        color: var(--mapa-violeta-cor-destaque); 
-        font-size: 1.3em; 
-        margin-bottom: 18px; 
-        text-align: center; 
-    }
-    .mapa-cnv-form-container label { 
-        display: block; 
-        margin: 10px 0 5px 0; 
-        color: var(--mapa-violeta-cor-texto-form); 
-        font-weight: 500; 
-        font-size: 0.85em; 
-    }
-    .mapa-cnv-form-container textarea, 
-    .mapa-cnv-form-container select, 
-    .mapa-cnv-form-container input { 
-        width: 100%; 
-        padding: 9px 12px; 
-        background-color: rgba(0,0,0,0.5); 
-        border: 1px solid var(--mapa-violeta-borda-form); 
-        color: var(--color-white); 
-        border-radius: 6px; 
-        font-size: 0.9em; 
-    }
-    .mapa-cnv-form-container textarea { 
-        min-height: 60px; 
-        resize: vertical; 
-    }
-    .mapa-cnv-form-container button { 
-        padding: 10px 15px; 
-        border-radius: 20px; 
-        font-weight: bold; 
-        font-size: 0.9em; 
-        display: block; 
-        width: 100%; 
-        margin-top: 15px; 
-        cursor: pointer; 
-    }
-    .mapa-cnv-form-container button[type="submit"] { 
-        background: linear-gradient(135deg, var(--mapa-violeta-cor-destaque), #8e44ad); 
-        color: white; 
-        border: none; 
-    }
-    .mapa-cnv-form-container button#cancel-cnv-form-btn { 
-        background-color: #6c757d; 
-        color: white; 
-        border: none; 
     }
 
-    .mapa-filtros-container { 
-        background-color: var(--mapa-violeta-fundo-form); 
-        padding: 15px 20px; 
-        border-radius: 10px; 
-        border: 1px solid var(--mapa-violeta-borda-form); 
-        margin-bottom: 20px; 
-        box-shadow: 0 4px 15px rgba(0,0,0,0.25); 
+    .legenda-cor {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        margin-right: 10px;
+        border: 2px solid white;
     }
-    .mapa-filtros-container h4 { 
-        color: var(--mapa-violeta-cor-destaque); 
-        font-size: 1.2em; 
-        margin-bottom: 15px; 
-        text-align: center; 
-    }
-    #formFiltrosMapa { 
-        display: grid; 
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
-        gap: 15px; 
-    }
-    .filtro-grupo { display: flex; flex-direction: column; }
-    .filtro-grupo label { 
-        font-size: 0.85em; 
-        color: var(--mapa-violeta-cor-texto-form); 
-        margin-bottom: 5px; 
-    }
-    .filtro-acoes { 
-        grid-column: 1 / -1; 
-        display: flex; 
-        gap: 10px; 
-        justify-content: center; 
-        margin-top: 10px; 
-    }
-    .filtro-acoes .btn-sm { 
-        padding: 6px 12px; 
-        font-size: 0.85em; 
-        border-radius: 5px; 
-        border: none; 
-        cursor: pointer; 
-        background-color: var(--mapa-violeta-cor-destaque); 
-        color: white; 
-    }
-    .filtro-acoes #btnLimparFiltrosMapa { background-color: #6c757d; }
-    
-    .location-permission-modal { 
-        display: none; 
-        position: fixed; 
-        z-index: 2000; 
-        left: 0; 
-        top: 0; 
-        width: 100%; 
-        height: 100%; 
-        background-color: rgba(0,0,0,0.7); 
-        justify-content: center; 
-        align-items: center; 
-    }
-    .location-permission-modal.visible { display: flex; }
-    .location-permission-content { 
-        background-color: var(--mapa-violeta-fundo-form); 
-        color: var(--mapa-violeta-cor-texto-form); 
-        padding: 25px; 
-        border-radius: 10px; 
-        text-align: center; 
-        max-width: 400px; 
-    }
-
-    .btn { 
-        padding: 8px 16px; 
-        border-radius: 5px; 
-        border: none; 
-        cursor: pointer; 
-        font-size: 0.9em; 
-    }
-    .btn--primary { 
-        background-color: var(--mapa-violeta-cor-destaque); 
-        color: white; 
-    }
-    .btn--secondary { background-color: #ffc107; color: #000; }
-    .btn--danger { background-color: #dc3545; color: white; }
 
     @media (max-width: 768px) {
         .mapa-violeta-main-area { padding: 15px; }
         .mapa-violeta-header-secao h1 { font-size: 1.7em; }
-        #map { height: 45vh; min-height: 300px; }
-    }
-    @media (max-width: 480px) {
-        .mapa-violeta-main-area { padding: 10px; }
-        .mapa-violeta-header-secao h1 { font-size: 1.5em; }
-        .mapa-cnv-form-container { 
-            bottom: 60px; 
-            left: 10px; 
-            right: 10px; 
-            max-width: none; 
-            width: auto; 
-            padding: 15px; 
-        }
+        #map { height: 50vh; min-height: 300px; }
+        .estatisticas { grid-template-columns: 1fr; }
     }
     </style>
 </head>
@@ -426,306 +195,198 @@
         <main class="main-content-area">
             <section class="mapa-violeta-main-area">
                 <div class="mapa-violeta-header-secao">
-                    <h1><i class="fas fa-map-marked-alt"></i> Mapa Violeta CNV</h1>
-                    <p class="subtitulo-mapa">Partilhe suas experiências e observações. Clique no mapa para adicionar um registro.<br>
-                    <span id="location-status-message" style="font-size:0.9em; opacity:0.8;">
-                        Para ver outros usuários próximos, permita o acesso à sua localização.
+                    <h1><i class="fas fa-map-marked-alt"></i> Mapa da Violência contra Pessoas Trans - 2025</h1>
+                    <p class="subtitulo-mapa">Casos noticiados de violência letal contra pessoas trans e travestis no Brasil<br>
+                    <span style="font-size:0.9em; opacity:0.9;">
+                        Dados compilados a partir de reportagens jornalísticas
                     </span></p>
+                </div>
+
+                <div class="info-painel">
+                    <h3><i class="fas fa-exclamation-triangle"></i> Importante</h3>
+                    <p>Estes casos representam apenas os <strong>noticiados pela imprensa em 2025</strong>. Há significativa subnotificação. 
+                    Fonte principal: Dossiê ANTRA 2024 registrou 122 mortes no ano anterior.</p>
+                </div>
+
+                <div class="estatisticas">
+                    <div class="estatistica-item">
+                        <span class="estatistica-numero">6</span>
+                        <span class="estatistica-label">Casos Confirmados 2025</span>
+                    </div>
+                    <div class="estatistica-item">
+                        <span class="estatistica-numero">5</span>
+                        <span class="estatistica-label">Estados com Ocorrências</span>
+                    </div>
+                    <div class="estatistica-item">
+                        <span class="estatistica-numero">122</span>
+                        <span class="estatistica-label">Mortes em 2024 (ANTRA)</span>
+                    </div>
                 </div>
                 
                 <div id="map"></div>
 
-                <!-- Formulário de Filtros -->
-                <div class="mapa-filtros-container" id="mapaFiltrosContainer">
-                    <h4><i class="fas fa-filter"></i> Filtrar Registros</h4>
-                    <form id="formFiltrosMapa">
-                        <div class="filtro-grupo">
-                            <label for="filtro_tipo_registro">Tipo de Registro:</label>
-                            <select name="filtro_tipo_registro" id="filtro_tipo_registro">
-                                <option value="">Todos os Tipos</option>
-                                <option value="alerta_perigo">🚨 Alerta de Perigo</option>
-                                <option value="local_acolhedor">💖 Local Acolhedor</option>
-                                <option value="ponto_apoio">🤝 Ponto de Apoio</option>
-                                <option value="evento_positivo">🎉 Evento Positivo</option>
-                                <option value="denuncia_violencia">🗣️ Denúncia</option>
-                                <option value="reivindicacao_melhoria">🚧 Reivindicação</option>
-                            </select>
-                        </div>
-                        <div class="filtro-grupo">
-                            <label for="filtro_usuario">Por Usuário (@nick):</label>
-                            <input type="text" name="filtro_usuario" id="filtro_usuario" placeholder="Nick do usuário">
-                        </div>
-                        <div class="filtro-acoes">
-                            <button type="submit" class="btn btn--primary btn-sm"><i class="fas fa-search"></i> Aplicar Filtros</button>
-                            <button type="button" id="btnLimparFiltrosMapa" class="btn btn-sm"><i class="fas fa-times-circle"></i> Limpar Filtros</button>
-                        </div>
-                    </form>
-                </div>
-                
-                <div id="cnv-form-expander">
-                    <button id="toggle-cnv-form-btn"><i class="fas fa-plus-circle"></i> Novo Registro</button>
-                </div>
-
-                <div class="mapa-cnv-form-container" id="mapa-cnv-form">
-                    <h3><i class="fas fa-heartbeat"></i> Registrar Experiência/Observação</h3>
-                    <form id="cnv-form-mapa-interno">
-                        <input type="hidden" name="action" id="form-action" value="criar">
-                        <input type="hidden" name="registro_id_editar" id="form-registro-id-editar">
-                        <input type="hidden" name="latitude" id="form-latitude">
-                        <input type="hidden" name="longitude" id="form-longitude">
-                        <div>
-                            <label for="tipo_registro_mapa">Tipo de Registro:*</label>
-                            <select name="tipo_registro" id="tipo_registro_mapa" required>
-                                <option value="" disabled selected>Selecione...</option>
-                                <option value="alerta_perigo">🚨 Alerta de Perigo</option>
-                                <option value="local_acolhedor">💖 Local Acolhedor</option>
-                                <option value="ponto_apoio">🤝 Ponto de Apoio</option>
-                                <option value="evento_positivo">🎉 Evento Positivo</option>
-                                <option value="denuncia_violencia">🗣️ Denúncia</option>
-                                <option value="reivindicacao_melhoria">🚧 Reivindicação</option>
-                            </select>
-                        </div>
-                        <label for="cnv_observacao_mapa">1. Observação (Fatos)*:</label>
-                        <textarea name="observacao" id="cnv_observacao_mapa" required placeholder="Ex: Vi pichações..."></textarea>
-                        <label for="cnv_sentimento_mapa">2. Sentimento*:</label>
-                        <textarea name="sentimento" id="cnv_sentimento_mapa" required placeholder="Ex: Senti medo..."></textarea>
-                        <label for="cnv_necessidade_mapa">3. Necessidade*:</label>
-                        <textarea name="necessidade" id="cnv_necessidade_mapa" required placeholder="Ex: Necessidade de segurança..."></textarea>
-                        <label for="cnv_pedido_mapa">4. Pedido*:</label>
-                        <textarea name="pedido" id="cnv_pedido_mapa" required placeholder="Ex: Gostaria que a prefeitura limpasse..."></textarea>
-                        <button type="submit" id="submit-cnv-form-btn"><i class="fas fa-map-marker-alt"></i> Enviar Registro</button>
-                        <button type="button" id="cancel-cnv-form-btn">Cancelar</button>
-                    </form>
+                <div class="legenda">
+                    <h4><i class="fas fa-key"></i> Legenda dos Marcadores</h4>
+                    <div class="legenda-item">
+                        <div class="legenda-cor" style="background-color: #e74c3c;"></div>
+                        <span>Homicídio Confirmado</span>
+                    </div>
+                    <div class="legenda-item">
+                        <div class="legenda-cor" style="background-color: #f39c12;"></div>
+                        <span>Morte após Agressão</span>
+                    </div>
+                    <div class="legenda-item">
+                        <div class="legenda-cor" style="background-color: #3498db;"></div>
+                        <span>Caso em Investigação</span>
+                    </div>
                 </div>
             </section>
         </main>
     </div>
 
-    <div class="location-permission-modal" id="location-permission-modal">
-        <div class="location-permission-content">
-            <h3><i class="fas fa-map-marker-alt"></i> Compartilhar Localização?</h3>
-            <p>Para mostrar outros usuários próximos no mapa e melhorar sua experiência, precisamos da sua permissão para acessar sua localização aproximada. Sua localização exata nunca será compartilhada.</p>
-            <div class="location-permission-buttons">
-                <button id="btn-permitir-localizacao" class="btn-permitir">Permitir</button>
-                <button id="btn-negar-localizacao" class="btn-negar">Agora Não</button>
-            </div>
-        </div>
-    </div>
-
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <script>
-    // Configuração
-    const CONFIG = {
-        API_BASE_URL: 'https://mapavioleta-github-io-3.onrender.com',
-        MAP: {
-            defaultCenter: [-23.1896, -45.8841],
-            defaultZoom: 13
-        }
-    };
-
     document.addEventListener('DOMContentLoaded', () => {
-        // Elementos DOM
-        const mapElement = document.getElementById('map');
-        const cnvFormExpanderButton = document.getElementById('toggle-cnv-form-btn');
-        const cnvFormContainer = document.getElementById('mapa-cnv-form');
-        const cnvForm = document.getElementById('cnv-form-mapa-interno');
-        const cancelCnvFormBtn = document.getElementById('cancel-cnv-form-btn');
-        const latitudeInput = document.getElementById('form-latitude');
-        const longitudeInput = document.getElementById('form-longitude');
-        const locationStatusMessage = document.getElementById('location-status-message');
-        const submitCnvFormBtn = document.getElementById('submit-cnv-form-btn');
-        const formFiltrosMapa = document.getElementById('formFiltrosMapa');
-        const btnLimparFiltrosMapa = document.getElementById('btnLimparFiltrosMapa');
-        const locationModal = document.getElementById('location-permission-modal');
-        const btnPermitirLoc = document.getElementById('btn-permitir-localizacao');
-        const btnNegarLoc = document.getElementById('btn-negar-localizacao');
-
-        // Variáveis de estado
-        let currentMapClickMarker;
-        let map;
-        let cnvMarkersLayer = L.layerGroup();
-        let allCnvMarkersData = [];
-        let currentFilters = {};
-
-        // Funções do Mapa
-        function initMap() {
-            map = L.map(mapElement).setView(CONFIG.MAP.defaultCenter, CONFIG.MAP.defaultZoom);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '© OpenStreetMap contributors'
-            }).addTo(map);
-
-            cnvMarkersLayer.addTo(map);
-
-            // Evento de clique no mapa
-            map.on('click', (e) => {
-                if (currentMapClickMarker) map.removeLayer(currentMapClickMarker);
-                currentMapClickMarker = L.marker(e.latlng).addTo(map);
-                latitudeInput.value = e.latlng.lat;
-                longitudeInput.value = e.latlng.lng;
-                toggleCnvForm(true);
-            });
-
-            loadMapMarkers();
-        }
-
-        // Carregar marcadores
-        async function loadMapMarkers() {
-            try {
-                const response = await fetch(`${CONFIG.API_BASE_URL}/?action=get-pontos`);
-                const resultado = await response.json();
-                
-                cnvMarkersLayer.clearLayers();
-                allCnvMarkersData = [];
-                
-                if (resultado.success && resultado.data) {
-                    allCnvMarkersData = resultado.data;
-                    allCnvMarkersData.forEach(addCnvMarkerToMap);
-                }
-            } catch (error) {
-                console.error('Erro ao carregar marcadores:', error);
+        // Dados dos casos de violência contra pessoas trans - 2025
+        const casosTrans2025 = [
+            {
+                nome: "Danielly (Danny) Rocha",
+                cidade: "Rio de Janeiro",
+                estado: "RJ",
+                data: "2025-05-03",
+                tipo: "Homicídio",
+                descricao: "Ativista e cozinheira encontrada morta em sua residência na Lapa. Caso investigado pela Polícia Civil.",
+                coordenadas: [-22.9068, -43.1729],
+                fonte: "O Dia / CNN / Agência Brasil",
+                cor: "#e74c3c",
+                icone: "🚨"
+            },
+            {
+                nome: "Christina Maciel Oliveira",
+                cidade: "Belo Horizonte",
+                estado: "MG", 
+                data: "2025-10-20",
+                tipo: "Homicídio",
+                descricao: "Espancada até a morte em via pública. Agressor (ex-companheiro) preso.",
+                coordenadas: [-19.9167, -43.9345],
+                fonte: "CNN Brasil, TJMG, MDHC",
+                cor: "#e74c3c",
+                icone: "🚨"
+            },
+            {
+                nome: "Alice Martins Alves", 
+                cidade: "Belo Horizonte",
+                estado: "MG",
+                data: "2025-11-09",
+                tipo: "Morte após Agressão",
+                descricao: "Espancada na Savassi em 23/10/2025, internada e faleceu por complicações. Investigação em curso.",
+                coordenadas: [-19.9200, -43.9376],
+                fonte: "CNN Brasil",
+                cor: "#f39c12",
+                icone: "⚠️"
+            },
+            {
+                nome: "Vítima em Rio Verde",
+                cidade: "Rio Verde",
+                estado: "GO",
+                data: "2025-10-15",
+                tipo: "Homicídio",
+                descricao: "Mulher trans perseguida e morta. Caso violento que envolveu tortura e levou à prisão de suspeitos.",
+                coordenadas: [-17.7450, -50.9313],
+                fonte: "Metrópoles",
+                cor: "#e74c3c", 
+                icone: "🚨"
+            },
+            {
+                nome: "Vítima em Belo Jardim",
+                cidade: "Belo Jardim",
+                estado: "PE",
+                data: "2025-10-02", 
+                tipo: "Homicídio",
+                descricao: "Mulher trans assassinada a tiros. Investigação em curso.",
+                coordenadas: [-8.3356, -36.4242],
+                fonte: "Diario de Pernambuco",
+                cor: "#e74c3c",
+                icone: "🚨"
+            },
+            {
+                nome: "Casos em São Paulo",
+                cidade: "São Paulo",
+                estado: "SP",
+                data: "2025-04-15",
+                tipo: "Agressões",
+                descricao: "Agressões no centro de SP e casos de transfobia registrados em 2025.",
+                coordenadas: [-23.5505, -46.6333],
+                fonte: "CNN Brasil",
+                cor: "#3498db",
+                icone: "🔍"
             }
-        }
+        ];
 
-        // Adicionar marcador ao mapa
-        function addCnvMarkerToMap(ponto) {
-            const emojiMap = { 
-                'alerta_perigo': '🚨', 
-                'local_acolhedor': '💖', 
-                'ponto_apoio': '🤝', 
-                'evento_positivo': '🎉', 
-                'denuncia_violencia': '🗣️', 
-                'reivindicacao_melhoria': '🚧' 
-            };
-            const emoji = emojiMap[ponto.tipo_registro] || '📍';
-            
+        // Inicializar mapa
+        const map = L.map('map').setView([-15, -55], 4);
+
+        // Adicionar tile layer
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors',
+            maxZoom: 18
+        }).addTo(map);
+
+        // Adicionar marcadores para cada caso
+        casosTrans2025.forEach(caso => {
+            // Criar ícone customizado baseado no tipo
             const customIcon = L.divIcon({
-                html: `<div style="font-size: 24px;">${emoji}</div>`,
-                className: 'custom-emoji-icon', 
-                iconSize: [32, 32], 
-                iconAnchor: [16, 32], 
-                popupAnchor: [0, -32]
+                html: `<div style="
+                    background-color: ${caso.cor}; 
+                    width: 30px; 
+                    height: 30px; 
+                    border-radius: 50%; 
+                    border: 3px solid white;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 14px;
+                    color: white;
+                    box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+                ">${caso.icone}</div>`,
+                className: 'custom-trans-icon',
+                iconSize: [30, 30],
+                iconAnchor: [15, 15]
             });
 
-            const marker = L.marker([ponto.latitude, ponto.longitude], { icon: customIcon });
-            
+            // Criar popup content
             const popupContent = `
                 <div class="popup-marker-details">
-                    <h4>${ponto.tipo_registro ? ponto.tipo_registro.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) : 'Registro'}</h4>
-                    <p><strong>Observação:</strong> ${ponto.observacao || 'N/A'}</p>
-                    ${ponto.sentimento ? `<p><strong>Sentimento:</strong> ${ponto.sentimento}</p>` : ''}
-                    ${ponto.necessidade ? `<p><strong>Necessidade:</strong> ${ponto.necessidade}</p>` : ''}
-                    ${ponto.pedido ? `<p><strong>Pedido:</strong> ${ponto.pedido}</p>` : ''}
-                    <small><em>Registrado em: ${new Date(ponto.data_criacao).toLocaleDateString('pt-BR')}</em></small>
+                    <h4>${caso.icone} ${caso.nome}</h4>
+                    <p><strong>Cidade:</strong> ${caso.cidade} - ${caso.estado}</p>
+                    <p><strong>Data:</strong> ${new Date(caso.data).toLocaleDateString('pt-BR')}</p>
+                    <p><strong>Tipo:</strong> ${caso.tipo}</p>
+                    <p><strong>Descrição:</strong> ${caso.descricao}</p>
+                    <div class="fonte">
+                        <strong>Fonte:</strong> ${caso.fonte}
+                    </div>
                 </div>
             `;
-            
-            marker.bindPopup(popupContent, { minWidth: 300, maxHeight: 400 });
-            cnvMarkersLayer.addLayer(marker);
-        }
 
-        // Mostrar/Esconder formulário
-        function toggleCnvForm(visible) {
-            if (visible) {
-                cnvFormContainer.classList.add('visible');
-            } else {
-                cnvFormContainer.classList.remove('visible');
-                cnvForm.reset();
-                document.getElementById('form-action').value = 'criar';
-                document.getElementById('form-registro-id-editar').value = '';
-                if(submitCnvFormBtn) submitCnvFormBtn.innerHTML = '<i class="fas fa-map-marker-alt"></i> Enviar Registro';
-                if (currentMapClickMarker) {
-                    map.removeLayer(currentMapClickMarker);
-                    currentMapClickMarker = null;
-                }
-            }
-        }
-
-        // Event Listeners
-        cnvFormExpanderButton.addEventListener('click', () => toggleCnvForm(!cnvFormContainer.classList.contains('visible')));
-        cancelCnvFormBtn.addEventListener('click', () => toggleCnvForm(false));
-
-        cnvForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            if (!latitudeInput.value || !longitudeInput.value) {
-                alert("Clique no mapa para definir a localização."); 
-                return;
-            }
-
-            const formData = new FormData(cnvForm);
-            const data = Object.fromEntries(formData);
-
-            try {
-                const response = await fetch(`${CONFIG.API_BASE_URL}/?action=registrar-ponto`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(data)
-                });
-
-                const resultado = await response.json();
-                
-                if (resultado.success) {
-                    alert('Registro criado com sucesso!');
-                    toggleCnvForm(false);
-                    loadMapMarkers();
-                } else {
-                    alert('Erro: ' + (resultado.mensagem || 'Tente novamente.'));
-                }
-            } catch (error) {
-                console.error('Erro ao criar registro:', error);
-                alert('Erro de conexão. Tente novamente.');
-            }
+            // Adicionar marcador ao mapa
+            const marker = L.marker(caso.coordenadas, { icon: customIcon })
+                .bindPopup(popupContent)
+                .addTo(map);
         });
 
-        // Geolocalização
-        function getUserLocation() {
-            if (!navigator.geolocation) {
-                alert('Geolocalização não suportada neste navegador');
-                return;
-            }
+        // Adicionar controle de camadas
+        const casosLayer = L.layerGroup();
+        casosTrans2025.forEach(caso => {
+            const marker = L.marker(caso.coordenadas).addTo(casosLayer);
+        });
 
-            navigator.geolocation.getCurrentPosition(
-                position => {
-                    const lat = position.coords.latitude;
-                    const lng = position.coords.longitude;
-                    map.setView([lat, lng], 15);
-                    if (locationStatusMessage) {
-                        locationStatusMessage.textContent = "Localização encontrada!";
-                    }
-                },
-                error => {
-                    let message = 'Erro ao obter localização: ';
-                    switch(error.code) {
-                        case error.PERMISSION_DENIED:
-                            message += 'Permissão negada';
-                            break;
-                        case error.POSITION_UNAVAILABLE:
-                            message += 'Localização indisponível';
-                            break;
-                        case error.TIMEOUT:
-                            message += 'Tempo esgotado';
-                            break;
-                        default:
-                            message += 'Erro desconhecido';
-                    }
-                    if (locationStatusMessage) {
-                        locationStatusMessage.textContent = message;
-                    }
-                }
-            );
-        }
+        // Adicionar controle de camadas ao mapa
+        L.control.layers(null, {
+            "Casos 2025": casosLayer
+        }).addTo(map);
 
-        // Inicialização
-        initMap();
-        
-        // Pedir localização ao carregar
-        setTimeout(() => {
-            getUserLocation();
-        }, 1000);
-
-        console.log('🌍 Mapa Violeta CNV - Carregado com sucesso!');
+        console.log('🗺️ Mapa da Violência contra Pessoas Trans carregado com sucesso!');
+        console.log(`📊 Total de casos plotados: ${casosTrans2025.length}`);
     });
     </script>
 </body>
