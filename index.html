@@ -5,244 +5,261 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mapa Violeta CNV 🗺️ Reprograma-T</title>
     
-    <link rel="icon" href="/public/images/logo.jpeg" sizes="any"> 
-    <link rel="apple-touch-icon" href="/public/images/logo.jpeg">
-    <meta name="theme-color" content="#FFA500">
+    <link rel="icon" href="favicon.ico" sizes="any"> 
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <meta name="theme-color" content="#9b59b6">
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="css/app.css">
+    <link rel="manifest" href="manifest.json">
     
-    <link rel="stylesheet" href="/public/css/layout_header.css">
-    <!-- Certifique-se que global.css define as variáveis como --mapa-violeta-cor-destaque -->
-    <link rel="stylesheet" href="/public/css/global.css"> 
     <style>
-    /* Estilos Globais - Variáveis mantidas para consistência dos formulários e tema geral */
+    /* Estilos Globais */
     :root {
         --mapa-violeta-cor-destaque: #9b59b6;
         --mapa-violeta-cor-destaque-hover: #8e44ad;
         --mapa-violeta-fundo-form: rgba(34, 28, 53, 0.95);
         --mapa-violeta-borda-form: rgba(155, 89, 182, 0.5);
         --mapa-violeta-cor-texto-form: #e0d0ff;
-        --mapa-violeta-fundo-pagina: var(--color-fundo-feed, #0a0a14);
+        --mapa-violeta-fundo-pagina: #0a0a14;
         --color-white: #FFFFFF;
         --font-principal: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        --color-orange: #FFA500; 
-        --color-gold: #FFD700; 
-        --color-silver: #C0C0C0; 
     }
 
-    /* Reset Básico e Configurações Globais (Mantido) */
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { height: 100%; } 
     body {
         font-family: var(--font-principal);
-        background-color: var(--color-black, #000);
-        color: var(--color-silver, #C0C0C0); 
+        background-color: var(--mapa-violeta-fundo-pagina);
+        color: #e0d0ff;
         display: flex;
         flex-direction: column;
         line-height: 1.6;
-        overflow: hidden; 
+        overflow: hidden;
     }
 
-    /* Estrutura da Página Principal (Mantida) */
-    body.pagina-mapa-violeta .main-content-area { background-color: var(--mapa-violeta-fundo-pagina); padding: 0; }
-    .mapa-violeta-main-area { flex-grow: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; }
-    .mapa-violeta-header-secao { text-align: center; margin-bottom: 20px; }
-    .mapa-violeta-header-secao h1 { color: var(--mapa-violeta-cor-destaque); font-size: 2em; margin-bottom: 10px; text-shadow: 0 0 8px rgba(155, 89, 182, 0.5); }
-    .mapa-violeta-header-secao h1 i { margin-right: 10px; }
-    .mapa-violeta-header-secao p.subtitulo-mapa { font-size: 1.05em; color: var(--mapa-violeta-cor-texto-form); max-width: 700px; margin: 0 auto 15px; }
+    /* Header */
+    .mobile-header {
+        background: rgba(26, 26, 46, 0.9);
+        padding: 15px 20px;
+        border-bottom: 2px solid var(--mapa-violeta-cor-destaque);
+        backdrop-filter: blur(10px);
+    }
 
-    /* ================================================= */
-    /* === INÍCIO DAS ALTERAÇÕES VISUAIS DO MAPA === */
-    /* ================================================= */
+    .mobile-header h1 {
+        color: var(--mapa-violeta-cor-destaque);
+        font-size: 1.5em;
+        text-align: center;
+        text-shadow: 0 0 8px rgba(155, 89, 182, 0.5);
+    }
 
-    /* 1. Estilos do Mapa e Ícones (TEMA CLARO) */
+    .mobile-header h1 i {
+        margin-right: 10px;
+    }
+
+    /* Área Principal */
+    .mapa-violeta-main-area {
+        flex-grow: 1;
+        padding: 20px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .mapa-violeta-header-secao {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .mapa-violeta-header-secao h1 {
+        color: var(--mapa-violeta-cor-destaque);
+        font-size: 2em;
+        margin-bottom: 10px;
+    }
+
+    .mapa-violeta-header-secao p.subtitulo-mapa {
+        font-size: 1.05em;
+        color: var(--mapa-violeta-cor-texto-form);
+        max-width: 700px;
+        margin: 0 auto 15px;
+    }
+
+    /* Mapa */
     #map {
-        height: 65vh; /* Aumenta a altura para melhor visualização */
+        height: 65vh;
         min-height: 500px;
         width: 100%;
         border-radius: 10px;
         border: 2px solid var(--mapa-violeta-borda-form);
         box-shadow: 0 4px 12px rgba(0,0,0,0.4);
         margin-bottom: 20px;
-        background-color: #e0e0e0; /* Fundo para o mapa enquanto carrega */
-    }
-    
-    /* A linha abaixo que aplicava o filtro 'invert' foi removida para usar o tema claro. */
-    /* .leaflet-tile-pane { filter: ... } */
-
-    .custom-registro-icon {
-        font-size: 32px; /* Ícone maior para melhor visibilidade */
-        color: var(--mapa-violeta-cor-destaque);
-        text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6); /* Sombra para destacar no mapa claro */
+        background-color: #e0e0e0;
     }
 
-    .user-map-icon { /* Mantido, pois já funciona bem em ambos os temas */
-        width: 30px;
-        height: 30px;
+    /* Botão Flutuante */
+    .fab-container {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 1000;
+    }
+
+    .fab {
+        width: 60px;
+        height: 60px;
         border-radius: 50%;
-        background-size: cover;
-        background-position: center;
-        border: 2px solid var(--mapa-violeta-cor-destaque);
-        box-shadow: 0 0 5px rgba(0,0,0,0.5);
+        background: var(--mapa-violeta-cor-destaque);
+        border: none;
+        color: white;
+        font-size: 1.5em;
+        cursor: pointer;
+        box-shadow: 0 4px 15px rgba(155, 89, 182, 0.4);
+        transition: all 0.3s ease;
     }
 
-    /* 2. Estilos dos Pop-ups (TEMA CLARO) */
+    .fab:hover {
+        background: var(--mapa-violeta-cor-destaque-hover);
+        transform: scale(1.05);
+    }
+
+    /* Modal */
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.8);
+        z-index: 2000;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .modal.active {
+        display: flex;
+    }
+
+    .modal-content {
+        background: var(--mapa-violeta-fundo-form);
+        width: 90%;
+        max-width: 500px;
+        max-height: 80vh;
+        border-radius: 12px;
+        border: 1px solid var(--mapa-violeta-borda-form);
+        overflow-y: auto;
+        color: var(--mapa-violeta-cor-texto-form);
+    }
+
+    .modal-header {
+        padding: 20px;
+        border-bottom: 1px solid var(--mapa-violeta-borda-form);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .modal-header h3 {
+        color: var(--mapa-violeta-cor-destaque);
+        margin: 0;
+    }
+
+    .close-btn {
+        background: none;
+        border: none;
+        color: var(--mapa-violeta-cor-texto-form);
+        font-size: 1.5em;
+        cursor: pointer;
+    }
+
+    .form-group {
+        padding: 15px 20px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+        color: var(--mapa-violeta-cor-texto-form);
+    }
+
+    .form-group select,
+    .form-group textarea {
+        width: 100%;
+        padding: 12px;
+        background: rgba(0,0,0,0.3);
+        border: 1px solid var(--mapa-violeta-borda-form);
+        border-radius: 6px;
+        color: var(--color-white);
+        font-size: 1em;
+    }
+
+    .form-group textarea {
+        min-height: 80px;
+        resize: vertical;
+    }
+
+    .btn-primary {
+        width: calc(100% - 40px);
+        margin: 20px;
+        padding: 15px;
+        background: linear-gradient(135deg, var(--mapa-violeta-cor-destaque), #8e44ad);
+        color: white;
+        border: none;
+        border-radius: 25px;
+        font-size: 1.1em;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(155, 89, 182, 0.4);
+    }
+
+    /* Popup do Mapa */
     .leaflet-popup-content-wrapper {
         background: #ffffff;
-        color: #333333; /* Cor do texto padrão para o pop-up */
+        color: #333333;
         border-radius: 8px;
         box-shadow: 0 3px 15px rgba(0,0,0,0.2);
-        border: 1px solid #ddd;
     }
-    .leaflet-popup-tip {
-        background: #ffffff;
-    }
-    
+
     .popup-marker-details {
         max-height: 280px;
         overflow-y: auto;
-        padding-right: 10px;
+        padding: 10px;
     }
-    .registro-foto-popup { /* Nova classe para a imagem no topo do pop-up */
-        width: 100%;
-        height: 120px;
-        object-fit: cover;
-        border-radius: 4px;
-        margin-bottom: 12px;
-        background-color: #f0f0f0; /* Cor de fundo caso a imagem não carregue */
-    }
+
     .popup-marker-details h4 {
         color: var(--mapa-violeta-cor-destaque);
-        margin-top: 0;
-        margin-bottom: 8px;
-        font-size: 1.15em;
-    }
-    .popup-marker-details p {
-        margin-bottom: 6px;
-        font-size: 0.9em;
-        line-height: 1.5;
-        color: #555555;
-    }
-    .popup-marker-details strong {
-        color: #111111;
-        font-weight: 600;
-    }
-    .popup-marker-details small,
-    .popup-marker-details small a.link-abrir-perfil-modal {
-        color: #777;
-        font-weight: normal;
-    }
-    .popup-marker-details small a.link-abrir-perfil-modal {
-        color: var(--mapa-violeta-cor-destaque) !important;
-        font-weight: bold;
-    }
-
-    /* 3. Estilos das Ações e Comentários no Pop-up (TEMA CLARO) */
-    .popup-marker-acoes-admin,
-    .popup-marker-comments-section {
-        margin-top: 12px;
-        padding-top: 12px;
-        border-top: 1px solid #eeeeee;
-    }
-    .popup-marker-acoes-admin { text-align: right; }
-    .popup-marker-acoes-admin .btn-sm { font-size: 0.8em; padding: 4px 10px; margin-left: 8px; border-radius: 4px; border: none; cursor: pointer; }
-    .popup-marker-acoes-admin .btn--secondary { background-color: #ffc107; color: #000; }
-    .popup-marker-acoes-admin .btn--danger { background-color: #dc3545; color: white; }
-    
-    .popup-marker-comments-section h5 {
-        font-size: 1em;
-        color: #333;
         margin-bottom: 10px;
     }
-    .map-comment-item {
-        background-color: #f7f7f7;
-        border-left: 3px solid #e8e8e8;
-        padding: 8px 12px;
-        border-radius: 4px;
-        margin-bottom: 8px;
-        color: #444;
-    }
-    .map-comment-item strong { color: var(--mapa-violeta-cor-destaque); }
-    
-    .form-comment-marker textarea {
-        width: 100%;
-        padding: 8px;
-        margin-top: 8px;
-        margin-bottom: 6px;
-        border: 1px solid #cccccc;
-        border-radius: 4px;
-        background-color: #f9f9f9;
-        color: #333;
-        font-size: 0.9em;
-        min-height: 40px;
-        resize: vertical;
-    }
-    .form-comment-marker textarea:focus {
-        border-color: var(--mapa-violeta-cor-destaque);
-        outline: none;
-        box-shadow: 0 0 0 2.5px rgba(155, 89, 182, 0.2);
-    }
-    .form-comment-marker button {
-        padding: 6px 12px;
-        font-size: 0.85em;
-        background-color: var(--mapa-violeta-cor-destaque);
-        color: white;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        float: right;
-    }
-    .form-comment-marker button:hover { background-color: var(--mapa-violeta-cor-destaque-hover); }
 
-    /* =============================================== */
-    /* === FIM DAS ALTERAÇÕES VISUAIS DO MAPA === */
-    /* =============================================== */
-
-    /* Estilos originais para formulários flutuantes, filtros e modais são mantidos */
-    #cnv-form-expander { position: fixed; bottom: 20px; left: 20px; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.3); cursor: pointer; transition: all 0.3s ease; }
-    #cnv-form-expander button { background-color: var(--mapa-violeta-cor-destaque); color: white; padding: 10px 15px; border-radius: 25px; border: none; font-size: 1em; }
-    #cnv-form-expander button:hover { background-color: var(--mapa-violeta-cor-destaque-hover); transform: scale(1.05); }
-    #cnv-form-expander i { margin-right: 8px; }
-
-    .mapa-cnv-form-container { position: fixed; bottom: 70px; left: 20px; max-width: 380px; width: 90%; max-height: calc(100vh - 140px); overflow-y: auto; z-index: 999; background-color: var(--mapa-violeta-fundo-form); padding: 20px; border-radius: 12px; border: 1px solid var(--mapa-violeta-borda-form); box-shadow: 0 6px 25px rgba(0,0,0,0.4); color: var(--mapa-violeta-cor-texto-form); opacity: 0; transform: translateY(30px); visibility: hidden; pointer-events: none; transition: all 0.3s ease; }
-    .mapa-cnv-form-container.visible { opacity: 1; transform: translateY(0); visibility: visible; pointer-events: auto; }
-    .mapa-cnv-form-container h3 { color: var(--mapa-violeta-cor-destaque); font-size: 1.3em; margin-bottom: 18px; text-align: center; }
-    .mapa-cnv-form-container label { display: block; margin: 10px 0 5px 0; color: var(--mapa-violeta-cor-texto-form); font-weight: 500; font-size: 0.85em; }
-    .mapa-cnv-form-container textarea, .mapa-cnv-form-container select, .mapa-cnv-form-container input { width: 100%; padding: 9px 12px; background-color: rgba(0,0,0,0.5); border: 1px solid var(--mapa-violeta-borda-form); color: var(--color-white); border-radius: 6px; font-size: 0.9em; }
-    .mapa-cnv-form-container textarea { min-height: 60px; resize: vertical; }
-    .mapa-cnv-form-container button { padding: 10px 15px; border-radius: 20px; font-weight: bold; font-size: 0.9em; display: block; width: 100%; margin-top: 15px; cursor: pointer; }
-    .mapa-cnv-form-container button[type="submit"] { background: linear-gradient(135deg, var(--mapa-violeta-cor-destaque), #8e44ad); color: white; border: none; }
-    .mapa-cnv-form-container button#cancel-cnv-form-btn { background-color: #6c757d; color: white; border: none; }
-
-    .mapa-filtros-container { background-color: var(--mapa-violeta-fundo-form); padding: 15px 20px; border-radius: 10px; border: 1px solid var(--mapa-violeta-borda-form); margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.25); }
-    .mapa-filtros-container h4 { color: var(--mapa-violeta-cor-destaque); font-size: 1.2em; margin-bottom: 15px; text-align: center; }
-    #formFiltrosMapa { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
-    .filtro-grupo { display: flex; flex-direction: column; }
-    .filtro-grupo label { font-size: 0.85em; color: var(--mapa-violeta-cor-texto-form); margin-bottom: 5px; }
-    .filtro-acoes { grid-column: 1 / -1; display: flex; gap: 10px; justify-content: center; margin-top: 10px; }
-    .filtro-acoes .btn-sm { padding: 6px 12px; font-size: 0.85em; border-radius: 5px; border: none; cursor: pointer; background-color: var(--mapa-violeta-cor-destaque); color: white; }
-    .filtro-acoes #btnLimparFiltrosMapa { background-color: #6c757d; }
-    
-    .location-permission-modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.7); justify-content: center; align-items: center; }
-    .location-permission-modal.visible { display: flex; }
-    .location-permission-content { background-color: var(--mapa-violeta-fundo-form); color: var(--mapa-violeta-cor-texto-form); padding: 25px; border-radius: 10px; text-align: center; max-width: 400px; }
-
+    /* Responsivo */
     @media (max-width: 768px) {
         .mapa-violeta-main-area { padding: 15px; }
         .mapa-violeta-header-secao h1 { font-size: 1.7em; }
-        #map { height: 45vh; min-height: 300px; }
+        #map { height: 55vh; min-height: 400px; }
+        .modal-content { width: 95%; margin: 20px; }
     }
+
     @media (max-width: 480px) {
         .mapa-violeta-main-area { padding: 10px; }
         .mapa-violeta-header-secao h1 { font-size: 1.5em; }
-        .mapa-cnv-form-container { bottom: 60px; left: 10px; right: 10px; max-width: none; width: auto; padding: 15px; }
+        #map { height: 50vh; min-height: 350px; }
     }
-</style>
+    </style>
 </head>
 <body class="pagina-mapa-violeta">
-    <?php require_once APP_PATH . '/templates/layout_header_form.php'; ?>
+    <!-- Header Mobile -->
+    <header class="mobile-header">
+        <h1><i class="fas fa-map-marked-alt"></i> Mapa Violeta CNV</h1>
+    </header>
 
+    <!-- Área Principal -->
     <div class="app-main-container">
         <main class="main-content-area">
             <section class="mapa-violeta-main-area">
@@ -254,562 +271,131 @@
                     </span></p>
                 </div>
                 
-                <div id="map"></div> <!-- ÚNICA INSTÂNCIA DO MAPA -->
+                <!-- Mapa -->
+                <div id="map"></div>
 
-                <!-- Formulário de Filtros -->
-                <div class="mapa-filtros-container" id="mapaFiltrosContainer">
-                    <h4><i class="fas fa-filter"></i> Filtrar Registros</h4>
-                    <form id="formFiltrosMapa">
-                        <div class="filtro-grupo">
-                            <label for="filtro_tipo_registro">Tipo de Registro:</label>
-                            <select name="filtro_tipo_registro" id="filtro_tipo_registro">
-                                <option value="">Todos os Tipos</option>
-                                <option value="alerta_perigo">🚨 Alerta de Perigo</option>
-                                <option value="local_acolhedor">💖 Local Acolhedor</option>
-                                <option value="ponto_apoio">🤝 Ponto de Apoio</option>
-                                <option value="evento_positivo">🎉 Evento Positivo</option>
-                                <option value="denuncia_violencia">🗣️ Denúncia</option>
-                                <option value="reivindicacao_melhoria">🚧 Reivindicação</option>
-                            </select>
-                        </div>
-                        <div class="filtro-grupo">
-                            <label for="filtro_usuario">Por Usuário (@nick):</label>
-                            <input type="text" name="filtro_usuario" id="filtro_usuario" placeholder="Nick do usuário">
-                        </div>
-                        <div class="filtro-grupo">
-                            <label for="filtro_data_de">Data do Fato (De):</label>
-                            <input type="date" name="filtro_data_de" id="filtro_data_de">
-                        </div>
-                        <div class="filtro-grupo">
-                            <label for="filtro_data_ate">Data do Fato (Até):</label>
-                            <input type="date" name="filtro_data_ate" id="filtro_data_ate">
-                        </div>
-                        <div class="filtro-grupo">
-                            <label for="filtro_termo">Buscar em Observação/Pedido:</label>
-                            <input type="text" name="filtro_termo" id="filtro_termo" placeholder="Palavra-chave">
-                        </div>
-                        <div class="filtro-acoes">
-                            <button type="submit" class="btn btn--primary btn-sm"><i class="fas fa-search"></i> Aplicar Filtros</button>
-                            <button type="button" id="btnLimparFiltrosMapa" class="btn btn-sm"><i class="fas fa-times-circle"></i> Limpar Filtros</button>
-                        </div>
-                    </form>
-                </div>
-                
-                <div id="cnv-form-expander">
-                    <button id="toggle-cnv-form-btn"><i class="fas fa-plus-circle"></i> Novo Registro</button>
+                <!-- Botão Flutuante -->
+                <div class="fab-container">
+                    <button id="fab-main" class="fab" title="Novo Registro">
+                        <i class="fas fa-plus"></i>
+                    </button>
                 </div>
 
-                <div class="mapa-cnv-form-container" id="mapa-cnv-form">
-                    <h3><i class="fas fa-heartbeat"></i> Registrar Experiência/Observação</h3>
-                    <form id="cnv-form-mapa-interno">
-                        <input type="hidden" name="action" id="form-action" value="criar">
-                        <input type="hidden" name="registro_id_editar" id="form-registro-id-editar">
-                        <input type="hidden" name="latitude" id="form-latitude">
-                        <input type="hidden" name="longitude" id="form-longitude">
-                        <div>
-                            <label for="tipo_registro_mapa">Tipo de Registro:*</label>
-                            <select name="tipo_registro" id="tipo_registro_mapa" required>
-                                <option value="" disabled selected>Selecione...</option>
-                                <option value="alerta_perigo">🚨 Alerta de Perigo</option>
-                                <option value="local_acolhedor">💖 Local Acolhedor</option>
-                                <option value="ponto_apoio">🤝 Ponto de Apoio</option>
-                                <option value="evento_positivo">🎉 Evento Positivo</option>
-                                <option value="denuncia_violencia">🗣️ Denúncia</option>
-                                <option value="reivindicacao_melhoria">🚧 Reivindicação</option>
-                            </select>
+                <!-- Modal do Formulário -->
+                <div id="form-modal" class="modal">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3><i class="fas fa-heartbeat"></i> Novo Registro</h3>
+                            <button id="close-modal" class="close-btn">&times;</button>
                         </div>
-                        <label for="cnv_observacao_mapa">1. Observação (Fatos)*:</label>
-                        <textarea name="observacao" id="cnv_observacao_mapa" required placeholder="Ex: Vi pichações..."></textarea>
-                        <label for="cnv_sentimento_mapa">2. Sentimento*:</label>
-                        <textarea name="sentimento" id="cnv_sentimento_mapa" required placeholder="Ex: Senti medo..."></textarea>
-                        <label for="cnv_necessidade_mapa">3. Necessidade*:</label>
-                        <textarea name="necessidade" id="cnv_necessidade_mapa" required placeholder="Ex: Necessidade de segurança..."></textarea>
-                        <label for="cnv_pedido_mapa">4. Pedido*:</label>
-                        <textarea name="pedido" id="cnv_pedido_mapa" required placeholder="Ex: Gostaria que a prefeitura limpasse..."></textarea>
-                        <div>
-                            <label for="descricao_adicional_mapa">Descrição Adicional:</label>
-                            <textarea name="descricao_adicional" id="descricao_adicional_mapa" placeholder="Mais detalhes..."></textarea>
-                        </div>
-                        <div>
-                            <label for="data_evento_ocorrido_mapa">Data e Hora do Fato:</label>
-                            <input type="datetime-local" name="data_evento_ocorrido" id="data_evento_ocorrido_mapa">
-                        </div>
-                        <button type="submit" id="submit-cnv-form-btn"><i class="fas fa-map-marker-alt"></i> Enviar Registro</button>
-                        <button type="button" id="cancel-cnv-form-btn">Cancelar</button>
-                    </form>
-                </div>
-                
-                <div class="mapa-legenda-filtros">
-                    <h4>Legenda (Exemplos):</h4>
-                    <span class="legenda-item">🚨 Alerta</span>
-                    <span class="legenda-item">💖 Acolhedor</span><br><br>
-                    <span class="legenda-item"><img src="public/images/avatar_padrao.png" alt="Usuário Online" style="border-radius:50%; border:1px solid #9b59b6; width:20px; height:20px; object-fit:cover;"> Usuário Online</span>
+                        <form id="cnv-form">
+                            <input type="hidden" name="latitude" id="form-latitude">
+                            <input type="hidden" name="longitude" id="form-longitude">
+                            
+                            <div class="form-group">
+                                <label for="tipo_registro">Tipo de Registro:*</label>
+                                <select name="tipo_registro" id="tipo_registro" required>
+                                    <option value="">Selecione...</option>
+                                    <option value="alerta_perigo">🚨 Alerta de Perigo</option>
+                                    <option value="local_acolhedor">💖 Local Acolhedor</option>
+                                    <option value="ponto_apoio">🤝 Ponto de Apoio</option>
+                                    <option value="evento_positivo">🎉 Evento Positivo</option>
+                                    <option value="denuncia_violencia">🗣️ Denúncia</option>
+                                    <option value="reivindicacao_melhoria">🚧 Reivindicação</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="observacao">Observação (Fatos)*:</label>
+                                <textarea name="observacao" id="observacao" required placeholder="Ex: Vi pichações..."></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="sentimento">Sentimento*:</label>
+                                <textarea name="sentimento" id="sentimento" required placeholder="Ex: Senti medo..."></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="necessidade">Necessidade*:</label>
+                                <textarea name="necessidade" id="necessidade" required placeholder="Ex: Necessidade de segurança..."></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="pedido">Pedido*:</label>
+                                <textarea name="pedido" id="pedido" required placeholder="Ex: Gostaria que a prefeitura limpasse..."></textarea>
+                            </div>
+
+                            <button type="submit" class="btn-primary">
+                                <i class="fas fa-map-marker-alt"></i> Enviar Registro
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </section>
         </main>
     </div>
-    
-    <div class="profile-modal-overlay-home" id="profile-modal-overlay-home" style="display:none;"> 
-        <?php require_once APP_PATH . '/templates/modal_perfil_rapido.php'; ?>
-    </div>
 
-    <div class="location-permission-modal" id="location-permission-modal">
-        <div class="location-permission-content">
-            <h3><i class="fas fa-map-marker-alt"></i> Compartilhar Localização?</h3>
-            <p>Para mostrar outros usuários próximos no mapa e melhorar sua experiência, precisamos da sua permissão para acessar sua localização aproximada. Sua localização exata nunca será compartilhada.</p>
-            <div class="location-permission-buttons">
-                <button id="btn-permitir-localizacao" class="btn-permitir">Permitir</button>
-                <button id="btn-negar-localizacao" class="btn-negar">Agora Não</button>
-            </div>
-        </div>
-    </div>
-
+    <!-- Scripts -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="js/config.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/map.js"></script>
+    <script src="js/api.js"></script>
+
     <script>
-    const idUsuarioLogadoJS_mapa = <?= json_encode($idUsuarioLogado) ?>;
-const isUsuarioAdminGeralJS_mapa = <?= json_encode($isUsuarioAdmin) ?>;
-
-document.addEventListener('DOMContentLoaded', () => {
-    // Seletores de elementos DOM
-    const mapElement = document.getElementById('map');
-    const cnvFormExpanderButton = document.getElementById('toggle-cnv-form-btn');
-    const cnvFormContainer = document.getElementById('mapa-cnv-form');
-    const cnvForm = document.getElementById('cnv-form-mapa-interno');
-    const cancelCnvFormBtn = document.getElementById('cancel-cnv-form-btn');
-    const latitudeInput = document.getElementById('form-latitude');
-    const longitudeInput = document.getElementById('form-longitude');
-    const locationStatusMessage = document.getElementById('location-status-message');
-    const submitCnvFormBtn = document.getElementById('submit-cnv-form-btn');
-    const formFiltrosMapa = document.getElementById('formFiltrosMapa');
-    const btnLimparFiltrosMapa = document.getElementById('btnLimparFiltrosMapa');
-    const profileModalOverlayHome = document.getElementById('profile-modal-overlay-home');
-    const locationModal = document.getElementById('location-permission-modal');
-    const btnPermitirLoc = document.getElementById('btn-permitir-localizacao');
-    const btnNegarLoc = document.getElementById('btn-negar-localizacao');
-
-    // Variáveis de estado e Leaflet
-    let currentMapClickMarker;
-    let map;
-    let userLocationMarkersLayer = L.layerGroup();
-    let cnvMarkersLayer = L.layerGroup();
-    let allCnvMarkersData = [];
-    let currentFilters = {};
-
-    // Função de utilidade para tratar erros de fetch
-    const handleFetchError = (error, context) => {
-        console.error(`Erro no contexto '${context}':`, error);
-        // Opcional: mostrar um alerta ou notificação para o usuário.
-        // alert(`Erro de comunicação no '${context}'. Verifique o console.`);
-    };
-
-    // LÓGICA DO MODAL DE PERFIL RÁPIDO
-    if (profileModalOverlayHome) {
-        const btnFecharProfileModalHome = profileModalOverlayHome.querySelector('.btn-fechar-modal-home');
-        btnFecharProfileModalHome?.addEventListener('click', () => profileModalOverlayHome.style.display = 'none');
-        profileModalOverlayHome.addEventListener('click', (e) => {
-            if (e.target === profileModalOverlayHome) profileModalOverlayHome.style.display = 'none';
-        });
-
-        window.showProfileModal = (userId, nome, fotoUrl, pronomes) => {
-            const modalProfileNomeHome = document.getElementById('modal-profile-nome-home');
-            const modalProfileFotoHome = document.getElementById('modal-profile-foto-home');
-            const modalProfilePronomesHome = document.getElementById('modal-profile-pronomes-home');
-            const btnVerPerfilCompletoModal = document.getElementById('btn-ver-perfil-completo-modal');
-
-            if (modalProfileNomeHome) modalProfileNomeHome.textContent = nome || 'Usuário';
-            if (modalProfileFotoHome) {
-                modalProfileFotoHome.src = fotoUrl || '/public/images/avatar_padrao.png';
-                modalProfileFotoHome.alt = `Foto de ${nome || 'Usuário'}`;
-            }
-            if (modalProfilePronomesHome) modalProfilePronomesHome.textContent = pronomes || 'Não informado';
-            if (btnVerPerfilCompletoModal) btnVerPerfilCompletoModal.href = `/perfil?id=${userId}`; // Rota amigável
-            if (profileModalOverlayHome) profileModalOverlayHome.style.display = 'flex';
-        };
-    }
-
-    // MOSTRAR/ESCONDER FORMULÁRIO CNV
-    const toggleCnvForm = (visible) => {
-        if (visible) {
-            cnvFormContainer?.classList.add('visible');
-        } else {
-            cnvFormContainer?.classList.remove('visible');
-            cnvForm?.reset();
-            document.getElementById('form-action').value = 'criar';
-            document.getElementById('form-registro-id-editar').value = '';
-            if(submitCnvFormBtn) submitCnvFormBtn.innerHTML = '<i class="fas fa-map-marker-alt"></i> Enviar Registro';
-            if (currentMapClickMarker && map?.hasLayer(currentMapClickMarker) && !currentMapClickMarker.getPopup()) {
-                map.removeLayer(currentMapClickMarker);
-                currentMapClickMarker = null;
-            }
+    // Configuração básica - será sobrescrita pelo config.js
+    const CONFIG = {
+        API_BASE_URL: 'https://mapavioleta-github-io-3.onrender.com',
+        MAP: {
+            defaultCenter: [-23.1896, -45.8841],
+            defaultZoom: 13
         }
     };
-    cnvFormExpanderButton?.addEventListener('click', () => toggleCnvForm(!cnvFormContainer.classList.contains('visible')));
-    cancelCnvFormBtn?.addEventListener('click', () => toggleCnvForm(false));
 
-    // INICIALIZAÇÃO DO MAPA
-    if (mapElement) {
-        map = L.map(mapElement).setView([-23.1896, -45.8841], 13);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        }).addTo(map);
+    // Inicialização básica
+    document.addEventListener('DOMContentLoaded', function() {
+        const fabButton = document.getElementById('fab-main');
+        const modal = document.getElementById('form-modal');
+        const closeModal = document.getElementById('close-modal');
+        const form = document.getElementById('cnv-form');
 
-        cnvMarkersLayer.addTo(map);
-        userLocationMarkersLayer.addTo(map);
-
-        // LÓGICA DE LOCALIZAÇÃO DO USUÁRIO
-        const handleLocationSuccess = async (position) => {
-            locationModal?.classList.remove('visible');
-            const { latitude, longitude } = position.coords;
-            map.setView([latitude, longitude], 14);
-            if (locationStatusMessage) locationStatusMessage.textContent = "Localização ativa. Buscando usuários próximos...";
-
-            const formDataLoc = new FormData();
-            formDataLoc.append('latitude', latitude);
-            formDataLoc.append('longitude', longitude);
-
-            try {
-                await fetch('/api/mapa-violeta/update-user-location', { method: 'POST', body: formDataLoc });
-            } catch (err) {
-                handleFetchError(err, 'updateUserLocation');
-            }
-            loadOtherUsersMarkers();
-            aplicarFiltrosDaUrl();
-        };
-
-        const handleLocationError = (error) => {
-            locationModal?.classList.remove('visible');
-            console.warn(`Erro ao obter localização: ${error.code} - ${error.message}`);
-            if (locationStatusMessage) locationStatusMessage.textContent = "Não foi possível obter sua localização.";
-            loadOtherUsersMarkers();
-            aplicarFiltrosDaUrl();
-        };
-
-        if (navigator.geolocation) {
-            navigator.permissions.query({ name: 'geolocation' }).then(permissionStatus => {
-                if (permissionStatus.state === 'granted') {
-                    navigator.geolocation.getCurrentPosition(handleLocationSuccess, handleLocationError, { enableHighAccuracy: false, timeout: 10000, maximumAge: 0 });
-                } else if (permissionStatus.state === 'prompt') {
-                    locationModal?.classList.add('visible');
-                } else {
-                    handleLocationError({ code: 1, message: `Permissão de localização ${permissionStatus.state}.` });
-                }
-                permissionStatus.onchange = function() {
-                    if (this.state === 'granted') {
-                        navigator.geolocation.getCurrentPosition(handleLocationSuccess, handleLocationError, { enableHighAccuracy: false, timeout: 10000, maximumAge: 0 });
-                    } else {
-                        handleLocationError({ code: 1, message: `Permissão de localização alterada para ${this.state}.` });
-                    }
-                }
-            });
-        } else {
-            loadOtherUsersMarkers();
-            aplicarFiltrosDaUrl();
-        }
-
-        btnPermitirLoc?.addEventListener('click', () => {
-            locationModal?.classList.remove('visible');
-            navigator.geolocation.getCurrentPosition(handleLocationSuccess, handleLocationError, { enableHighAccuracy: false, timeout: 10000, maximumAge: 0 });
-        });
-        btnNegarLoc?.addEventListener('click', () => {
-            locationModal?.classList.remove('visible');
-            handleLocationError({ code: 1, message: "Usuário negou o pedido de localização." });
+        // Abrir modal
+        fabButton.addEventListener('click', function() {
+            modal.classList.add('active');
         });
 
-        // CRIAÇÃO E MANIPULAÇÃO DE MARCADORES E POP-UPS
-        const createCnvMarkerPopupContent = (ponto) => {
-            const tipoFormatado = (ponto.tipo_registro || 'Registro').replace(/_/g, ' ');
-            const tipoFormatadoCapitalized = tipoFormatado.charAt(0).toUpperCase() + tipoFormatado.slice(1);
-            const nickPonto = ponto.nick_usuario || 'Anônimo';
-            const dataRegistro = ponto.data_registro ? new Date(ponto.data_registro).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Data não disponível';
+        // Fechar modal
+        closeModal.addEventListener('click', function() {
+            modal.classList.remove('active');
+        });
 
-            let html = `<div class="popup-marker-details"><h4>${tipoFormatadoCapitalized}</h4>`;
-            html += `<p><strong>Observação:</strong> ${ponto.cnv_observacao || 'N/A'}</p>`;
-            html += ponto.cnv_sentimento ? `<p><strong>Sentimento:</strong> ${ponto.cnv_sentimento}</p>` : '';
-            html += ponto.cnv_necessidade ? `<p><strong>Necessidade:</strong> ${ponto.cnv_necessidade}</p>` : '';
-            html += ponto.cnv_pedido ? `<p><strong>Pedido:</strong> ${ponto.cnv_pedido}</p>` : '';
-            html += ponto.descricao_adicional ? `<p><strong>Detalhes Adicionais:</strong> ${ponto.descricao_adicional}</p>` : '';
-            html += ponto.data_evento_ocorrido ? `<p><small>Data do Fato: ${new Date(ponto.data_evento_ocorrido).toLocaleString('pt-BR')}</small></p>` : '';
-            html += `<small>Por: <a href="#" class="link-abrir-perfil-modal" data-userid="${ponto.usuario_id}" data-nome="${nickPonto}" data-foto="${ponto.foto_perfil_usuario || '/public/images/avatar_padrao.png'}" data-pronomes="${ponto.pronomes_usuario || ''}" style="color: var(--mapa-violeta-cor-destaque); cursor:pointer;">${nickPonto}</a> em ${dataRegistro}</small></div>`;
-
-            if (idUsuarioLogadoJS_mapa && (ponto.usuario_id == idUsuarioLogadoJS_mapa || isUsuarioAdminGeralJS_mapa == 1)) {
-                html += `<div class="popup-marker-acoes-admin">
-                           <button class="btn-editar-ponto-mapa btn btn--secondary btn-sm" data-registro-id="${ponto.id}" title="Editar"><i class="fas fa-edit"></i> Editar</button>
-                           <button class="btn-apagar-ponto-mapa btn btn--danger btn-sm" data-registro-id="${ponto.id}" title="Apagar"><i class="fas fa-trash"></i> Apagar</button>
-                         </div>`;
-            }
-
-            html += `<div class="popup-marker-comments-section">
-                       <h5>Comentários:</h5>
-                       <div id="comments-for-marker-${ponto.id}-popup">Carregando...</div>
-                       <form class="form-comment-marker" data-registro-id="${ponto.id}">
-                         <textarea name="texto_comentario_mapa" placeholder="Comentário CNV..." rows="2" required></textarea>
-                         <button type="submit" class="btn">Comentar</button>
-                       </form>
-                     </div>`;
-            return html;
-        };
-
-        const addCnvMarkerToMap = (ponto) => {
-            const emojiMap = { 'alerta_perigo': '🚨', 'local_acolhedor': '💖', 'ponto_apoio': '🤝', 'evento_positivo': '🎉', 'denuncia_violencia': '🗣️', 'reivindicacao_melhoria': '🚧' };
-            const emoji = emojiMap[ponto.tipo_registro] || '📍';
-            const customIcon = L.divIcon({
-                html: `<div style="font-size: 24px;">${emoji}</div>`,
-                className: 'custom-emoji-icon', iconSize: [32, 32], iconAnchor: [16, 32], popupAnchor: [0, -32]
-            });
-            const marker = L.marker([ponto.latitude, ponto.longitude], { icon: customIcon });
-            marker.on('click', () => {
-                const popupContent = createCnvMarkerPopupContent(ponto);
-                marker.bindPopup(popupContent, { minWidth: 300, maxHeight: 400 }).openPopup();
-            });
-            cnvMarkersLayer.addLayer(marker);
-        };
-        
-        map.on('click', (e) => {
-            let clickedOnExistingCnvMarker = false;
-            cnvMarkersLayer.eachLayer(layer => {
-                if (layer instanceof L.Marker && layer.getLatLng().equals(e.latlng)) {
-                    clickedOnExistingCnvMarker = true;
-                }
-            });
-            if (clickedOnExistingCnvMarker) return;
-            
-            if (cnvFormContainer.classList.contains('visible')) {
-                toggleCnvForm(false);
-            } else {
-                if (currentMapClickMarker) map.removeLayer(currentMapClickMarker);
-                currentMapClickMarker = L.marker(e.latlng).addTo(map);
-                if (latitudeInput) latitudeInput.value = e.latlng.lat;
-                if (longitudeInput) longitudeInput.value = e.latlng.lng;
-                toggleCnvForm(true);
+        // Fechar modal clicando fora
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                modal.classList.remove('active');
             }
         });
 
-        // LÓGICA DE DADOS (FETCH)
-        const loadMapMarkersFiltered = async (filters = {}) => {
-            const queryString = new URLSearchParams(filters).toString();
-            const apiUrl = `/api/mapa-violeta/get-pontos-mapa${queryString ? '?' + queryString : ''}`;
-            try {
-                const response = await fetch(apiUrl);
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                const resultado = await response.json();
-                cnvMarkersLayer.clearLayers();
-                allCnvMarkersData = [];
-                if (resultado.success && resultado.data) {
-                    allCnvMarkersData = resultado.data;
-                    allCnvMarkersData.forEach(addCnvMarkerToMap);
-                }
-            } catch (error) {
-                handleFetchError(error, 'loadMapMarkersFiltered');
-            }
-        };
-
-        const loadOtherUsersMarkers = async () => {
-            userLocationMarkersLayer.clearLayers();
-            try {
-                const response = await fetch('/api/mapa-violeta/get-users-locations');
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                const data = await response.json();
-                if (data.success && data.users) {
-                    if (locationStatusMessage) {
-                        locationStatusMessage.textContent = data.users.length > 0 ? `Exibindo ${data.users.length} usuário(s) próximo(s).` : "Nenhum outro usuário online com localização compartilhada.";
-                    }
-                    data.users.forEach(user => {
-                        if (user.latitude_atual && user.longitude_atual && user.id != idUsuarioLogadoJS_mapa) {
-                            const userIcon = L.divIcon({
-                                html: `<div style="background-image: url('${user.foto_perfil_usuario || '/public/images/avatar_padrao.png'}');" class="user-map-icon"></div>`,
-                                className: '', iconSize: [30, 30], iconAnchor: [15, 15], popupAnchor: [0, -15]
-                            });
-                            const userMarker = L.marker([user.latitude_atual, user.longitude_atual], { icon: userIcon })
-                                .bindPopup(`<b><a href="#" class="link-abrir-perfil-modal" data-userid="${user.id}" data-nome="${user.nick_usuario || 'Usuário'}" data-foto="${user.foto_perfil_usuario || '/public/images/avatar_padrao.png'}" data-pronomes="${user.pronomes_usuario || ''}" style="color: var(--mapa-violeta-cor-destaque); cursor:pointer;">${user.nick_usuario || 'Usuário'}</a></b>`);
-                            userLocationMarkersLayer.addLayer(userMarker);
-                        }
-                    });
-                }
-            } catch (error) {
-                handleFetchError(error, 'loadOtherUsersMarkers');
-            }
-        };
-        
-        // EVENT LISTENERS DE SUBMISSÃO E FILTROS
-        cnvForm?.addEventListener('submit', async (e) => {
+        // Submit do formulário
+        form.addEventListener('submit', function(e) {
             e.preventDefault();
-            if (!latitudeInput.value || !longitudeInput.value) {
-                alert("Clique no mapa para definir a localização."); return;
-            }
-            const formData = new FormData(cnvForm);
-            if (submitCnvFormBtn) submitCnvFormBtn.disabled = true;
-            try {
-                const response = await fetch('/api/mapa-violeta/registrar-ponto-mapa', { method: 'POST', body: formData });
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                const resultado = await response.json();
-                if (resultado.success) {
-                    alert(resultado.mensagem || "Ação concluída com sucesso!");
-                    toggleCnvForm(false);
-                    loadMapMarkersFiltered(currentFilters);
-                } else {
-                    alert("Erro: " + (resultado.mensagem || "Tente novamente."));
-                }
-            } catch (error) {
-                handleFetchError(error, 'submitCnvForm');
-            } finally {
-                if (submitCnvFormBtn) submitCnvFormBtn.disabled = false;
-            }
-        });
-        
-        formFiltrosMapa?.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const formData = new FormData(formFiltrosMapa);
-            currentFilters = {};
-            for (let [key, value] of formData.entries()) {
-                if (value) currentFilters[key] = value;
-            }
-            const url = new URL(window.location);
-            url.search = new URLSearchParams(currentFilters).toString();
-            history.pushState({}, '', url);
-            loadMapMarkersFiltered(currentFilters);
-        });
-
-        btnLimparFiltrosMapa?.addEventListener('click', () => {
-            formFiltrosMapa.reset();
-            currentFilters = {};
-            history.pushState({}, '', window.location.pathname);
-            loadMapMarkersFiltered();
-        });
-
-        const aplicarFiltrosDaUrl = () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            let filtrosDaUrl = {};
-            urlParams.forEach((value, key) => {
-                if (key.startsWith('filtro_') && value) {
-                    filtrosDaUrl[key] = value;
-                    const inputElement = document.getElementById(key);
-                    if (inputElement) inputElement.value = value;
-                }
-            });
-            currentFilters = filtrosDaUrl;
-            loadMapMarkersFiltered(currentFilters);
-        };
-        
-        // DELEGATION DE EVENTOS PARA POP-UPS
-        map.on('popupopen', (e) => {
-            const popupNode = e.popup.getElement();
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData);
             
-            // Perfil modal
-            popupNode.querySelectorAll('.link-abrir-perfil-modal').forEach(link => {
-                if (link.dataset.listener) return;
-                link.addEventListener('click', (event) => {
-                    event.preventDefault();
-                    window.showProfileModal(link.dataset.userid, link.dataset.nome, link.dataset.foto, link.dataset.pronomes);
-                });
-                link.dataset.listener = 'true';
-            });
-            
-            // Carregar e submeter comentários
-            const commentForm = popupNode.querySelector('.form-comment-marker');
-            if (commentForm && !commentForm.dataset.listener) {
-                const registroId = commentForm.dataset.registroId;
-                const commentsDiv = popupNode.querySelector(`#comments-for-marker-${registroId}-popup`);
-                
-                const loadCnvMarkerComments = async () => {
-                     if (!commentsDiv) return;
-                     commentsDiv.innerHTML = '<p><small>Carregando...</small></p>';
-                     try {
-                         const response = await fetch(`/api/mapa-violeta/get-mapa-comentarios?registro_id=${registroId}`);
-                         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                         const result = await response.json();
-                         commentsDiv.innerHTML = '';
-                         if (result.success && result.comentarios?.length > 0) {
-                             result.comentarios.forEach(comment => {
-                                 const commentEl = document.createElement('div');
-                                 commentEl.className = 'map-comment-item';
-                                 commentEl.innerHTML = `<small><strong class="link-abrir-perfil-modal" data-userid="${comment.usuario_id}" data-nome="${comment.nick_usuario}" data-foto="${comment.foto_perfil_usuario || '/public/images/avatar_padrao.png'}" data-pronomes="${comment.pronomes_usuario || ''}" style="cursor:pointer;">@${comment.nick_usuario}</strong>: ${comment.texto_comentario} <em>(${new Date(comment.data_comentario).toLocaleDateString('pt-BR')})</em></small>`;
-                                 commentsDiv.appendChild(commentEl);
-                             });
-                         } else {
-                             commentsDiv.innerHTML = '<p><small>Nenhum comentário.</small></p>';
-                         }
-                     } catch (err) { handleFetchError(err, 'loadCnvMarkerComments'); }
-                };
-
-                commentForm.addEventListener('submit', async (event) => {
-                    event.preventDefault();
-                    const textarea = form.querySelector('textarea');
-                    if (!textarea.value.trim()) return;
-                    const submitButton = form.querySelector('button[type="submit"]');
-                    if(submitButton) submitButton.disabled = true;
-                    try {
-                        const response = await fetch('/api/mapa-violeta/registrar-mapa-comentario', { method: 'POST', body: new FormData(commentForm) });
-                        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                        const result = await response.json();
-                        if (result.success) {
-                            textarea.value = '';
-                            loadCnvMarkerComments();
-                        }
-                    } catch (err) { handleFetchError(err, 'submitComment'); }
-                    finally { if(submitButton) submitButton.disabled = false; }
-                });
-
-                loadCnvMarkerComments();
-                commentForm.dataset.listener = 'true';
+            if (!data.latitude || !data.longitude) {
+                alert('Clique no mapa para definir a localização primeiro!');
+                return;
             }
 
-            // Ações de Admin (Editar/Apagar)
-            const btnEditar = popupNode.querySelector('.btn-editar-ponto-mapa');
-            if(btnEditar && !btnEditar.dataset.listener){
-                btnEditar.addEventListener('click', () => {
-                    const ponto = allCnvMarkersData.find(p => p.id == btnEditar.dataset.registroId);
-                    if(ponto){
-                        // Preencher formulário
-                        document.getElementById('form-action').value = 'editar';
-                        document.getElementById('form-registro-id-editar').value = ponto.id;
-                        latitudeInput.value = ponto.latitude;
-                        longitudeInput.value = ponto.longitude;
-                        document.getElementById('tipo_registro_mapa').value = ponto.tipo_registro;
-                        document.getElementById('cnv_observacao_mapa').value = ponto.cnv_observacao;
-                        document.getElementById('cnv_sentimento_mapa').value = ponto.cnv_sentimento;
-                        document.getElementById('cnv_necessidade_mapa').value = ponto.cnv_necessidade;
-                        document.getElementById('cnv_pedido_mapa').value = ponto.cnv_pedido;
-                        document.getElementById('descricao_adicional_mapa').value = ponto.descricao_adicional || '';
-                        const dataInput = document.getElementById('data_evento_ocorrido_mapa');
-                        if(dataInput && ponto.data_evento_ocorrido) dataInput.value = ponto.data_evento_ocorrido.replace(' ', 'T').substring(0,16);
-
-                        if(submitCnvFormBtn) submitCnvFormBtn.innerHTML = '<i class="fas fa-save"></i> Salvar Alterações';
-                        toggleCnvForm(true);
-                        map.closePopup();
-                    }
-                });
-                btnEditar.dataset.listener = 'true';
-            }
-            
-            const btnApagar = popupNode.querySelector('.btn-apagar-ponto-mapa');
-            if(btnApagar && !btnApagar.dataset.listener){
-                btnApagar.addEventListener('click', async () => {
-                    if (confirm("Tem certeza que deseja apagar este registro?")) {
-                        const formData = new FormData();
-                        formData.append('action', 'apagar');
-                        formData.append('registro_id_apagar', btnApagar.dataset.registroId);
-                        try{
-                            const response = await fetch('/api/mapa-violeta/registrar-ponto-mapa', { method: 'POST', body: formData });
-                            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                            const result = await response.json();
-                            if(result.success){
-                                alert(result.mensagem || "Registro apagado!");
-                                map.closePopup();
-                                loadMapMarkersFiltered(currentFilters);
-                            }
-                        } catch(err) { handleFetchError(err, 'deleteMarker'); }
-                    }
-                });
-                btnApagar.dataset.listener = 'true';
-            }
+            // Aqui você pode enviar para a API
+            console.log('Dados do formulário:', data);
+            alert('Registro enviado com sucesso! (Demo)');
+            modal.classList.remove('active');
+            form.reset();
         });
 
-        // ATUALIZAÇÕES PERIÓDICAS
-        setInterval(() => loadMapMarkersFiltered(currentFilters), 300000); // 5 min
-        setInterval(loadOtherUsersMarkers, 60000); // 1 min
-    }
-});
-</script>
+        console.log('🌍 Mapa Violeta CNV - Inicializado');
+    });
+    </script>
 </body>
-</html>go, eu quero usar esse exemplo para criar um apk apenas para mapa violeta]
-]
+</html>
